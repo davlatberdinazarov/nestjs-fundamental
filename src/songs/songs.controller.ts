@@ -1,14 +1,15 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongDTO } from './dto/create-songs-dto';
 
 @Controller('songs')
 export class SongsController {
-    constructor(private songService: SongsService) { }
+    constructor(private readonly songService: SongsService) { }
+    @HttpCode(200)
     @Get()
     findAll() {
         try {
-            return this.songService.findAll();
+            return this.songService.findAllSongs();
         } catch (error) {
             throw new HttpException(
                 'server error',
@@ -21,23 +22,27 @@ export class SongsController {
 
     }
 
+    @HttpCode(201)
     @Post()
-    create(@Body() createSongDTO: CreateSongDTO) {
+    createSong(@Body() createSongDTO: CreateSongDTO) {
         return this.songService.create(createSongDTO)
     }
 
+    @HttpCode(200)
     @Get(':id')
-    findOne(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: number) {
-        return `Find song by ID: ${id}`;
+    findOne(@Param('id') id: string) {
+        return this.songService.findSongById(id);
     }
 
+    @HttpCode(201)
     @Put(':id')
-    update(@Param('id') id: string) {
-        return `Update song by ID: ${id}`;
+    updateSong(@Param('id') id: string, @Body() updateSongDTO: CreateSongDTO) {
+        return this.songService.update(id, updateSongDTO);
     }
 
+    @HttpCode(200)
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return `Delete song by ID: ${id}`;
+    deleteSong(@Param('id') id: string) {
+        return this.songService.delete(id);
     }
 }

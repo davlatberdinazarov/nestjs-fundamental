@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { SongsController } from './songs.controller';
 import { SongsService } from './songs.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Songs, SongsSchema } from './schemas/song.schema';
 
 // Mock xizmat
 const mockSongService = {
@@ -31,13 +33,10 @@ const mockSongService = {
 };
 
 @Module({
+  imports: [MongooseModule.forFeature([{ name: Songs.name, schema: SongsSchema }])],
   controllers: [SongsController],
   providers: [
-    // Bu yerda haqiqiy `SongsService` emas, balki mock xizmatni taqdim etamiz.
-    {
-      provide: SongsService,
-      useValue: mockSongService,
-    },
+    SongsService
   ],
 })
 export class SongsModule {}
